@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wine Quality Predictor</title>
+    <link rel="stylesheet" href="/static/css/styles.css"> <!-- Updated path for CSS -->
+</head>
+<body>
+    <div class="container">
+        <h1>Red Wine Quality Predictor</h1>
+        <form id="wineForm">
+            <label for="features">Enter Features (comma-separated):</label>
+            <input type="text" id="features" placeholder="e.g., 7.4, 0.7, 0.0, 1.9, ..." required>
+            <button type="submit">Predict</button>
+        </form>
+        <div id="result"></div>
+    </div>
+    <script>
+        document.getElementById('wineForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const featuresInput = document.getElementById('features').value;
+            
+            // Parse features as a comma-separated list of numbers
+            const features = featuresInput.split(',').map(Number);
+
+            try {
+                // Send POST request to the '/predict' endpoint
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ features })
+                });
+
+                // Handle the response
+                const result = await response.json();
+                const resultDiv = document.getElementById('result');
+                if (response.ok) {
+                    resultDiv.textContent = `Predicted Quality: ${result.quality}`;
+                } else {
+                    resultDiv.textContent = `Error: ${result.error}`;
+                }
+            } catch (error) {
+                document.getElementById('result').textContent = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
